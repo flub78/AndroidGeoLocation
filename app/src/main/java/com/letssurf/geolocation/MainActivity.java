@@ -44,7 +44,11 @@ public class MainActivity extends AppCompatActivity {
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
-    public void getLocation(View view) {
+    /**
+     * Activated on click on Get location button
+     * @param view
+     */
+    public void onClick(View view) {
         if (ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -55,13 +59,19 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             Log.d(TAG, "getLocation: permissions granted");
-            getAndDisplayLocation();
+            getLocation();
         }
     }
 
-    private void getAndDisplayLocation() {
+    /**
+     *
+     */
+    private void getLocation() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -69,8 +79,10 @@ public class MainActivity extends AppCompatActivity {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
+            Log.d(TAG, "getLocation: permissions not granted");
             return;
         }
+        Log.d(TAG, "getLocation: permissions granted");
 
         mFusedLocationClient.getLastLocation().addOnSuccessListener(
                 new OnSuccessListener<Location>() {
@@ -113,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 // otherwise, show a Toast
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getAndDisplayLocation();
+                    getLocation();
                 } else {
                     Toast.makeText(this,
                             R.string.location_permission_denied,
