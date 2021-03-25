@@ -29,16 +29,18 @@ public class MainActivity extends AppCompatActivity implements FetchAddressTask.
     public static final int REQUEST_LOCATION_PERMISSION = 99;
     private static final String TRACKING_LOCATION_KEY = "tracking_location";
 
+    // Views
     private ImageView mAndroidImageView;
     private AnimatorSet mRotateAnim;
     private TextView mLocationTextView;
     private Button mLocationButton;
 
+    // Location classes
     private Location mLastLocation;
     private FusedLocationProviderClient mFusedLocationClient;
-
     private boolean mTrackingLocation = false;
 
+    // Animation
     private LocationCallback mLocationCallback;
 
 
@@ -50,8 +52,16 @@ public class MainActivity extends AppCompatActivity implements FetchAddressTask.
         mLocationButton = (Button) findViewById(R.id.button_location);
         mLocationTextView = (TextView) findViewById(R.id.textview_location);
         mAndroidImageView = (ImageView) findViewById(R.id.imageview_android);
+
+        // Setup the animation
         mRotateAnim = (AnimatorSet) AnimatorInflater.loadAnimator
                 (this, R.animator.rotate);
+        mRotateAnim.setTarget(mAndroidImageView);
+
+        if (savedInstanceState != null) {
+            mTrackingLocation = savedInstanceState.getBoolean(
+                    TRACKING_LOCATION_KEY);
+        }
 
         // Initialize the FusedLocationClient.
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -65,6 +75,24 @@ public class MainActivity extends AppCompatActivity implements FetchAddressTask.
                 }
             }
         };
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mTrackingLocation) stopLocationTracking();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mTrackingLocation) startLocationTracking();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(TRACKING_LOCATION_KEY, mTrackingLocation);
     }
 
     /**
@@ -114,31 +142,6 @@ public class MainActivity extends AppCompatActivity implements FetchAddressTask.
             return;
         }
         Log.d(TAG, "The getLocation: permissions is granted");
-/*
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(
-                new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            mLastLocation = location;
-                            // Start the reverse geocode AsyncTask
-                            new FetchAddressTask(MainActivity.this,
-                                    MainActivity.this).execute(location);
-                            *//*
-                            mLocationTextView.setText(
-                                    getString(R.string.location_text,
-                                            mLastLocation.getLatitude(),
-                                            mLastLocation.getLongitude(),
-                                            mLastLocation.getTime()));
-
-                             *//*
-
-                        } else {
-                            mLocationTextView.setText(R.string.no_location);
-                        }
-                    }
-
-                }); */
 
         mFusedLocationClient.requestLocationUpdates
                 (getLocationRequest(), mLocationCallback,
